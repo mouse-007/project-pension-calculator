@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;"/>
   <title>养老金计算</title>
   <style>
     *{
@@ -176,10 +176,10 @@
     }
 
     function setLvList(){
-      const list = Array.from({ length: 20 }, (_, index) => {
+      const list = Array.from({ length: 60 }, (_, index) => {
         return {
-          value: (index + 1) / 100,
-          label: `${index + 1} %`
+          value: (index + 1) / 1000,
+          label: `${(index + 1)/10} %`
         }
       });
       addOptions(lvEl, list)
