@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>养老金计算</title>
+  <style>
+    *{
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+    }
+    .app{
+      width: 100%;
+      padding: 20px;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .form{
+      padding: 10px 20px;
+      background-color: #efefef;
+    }
+    .item{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px 0 ;
+    }
+    label{
+      display: block;
+      width: 90px;
+      text-align: right;
+    }
+    label::after{
+      content: ":";
+      padding: 0 10px 0 5px;
+    }
+    input, select{
+      flex: 1;
+      height: 32px;
+      padding: 3px 8px;
+      border: 1px solid #c8c8c8;
+      outline: none;
+      border-radius: 3px;
+    }
+    .result{
+      padding: 20px;
+      background-color: #efefef;
+      margin-top: 12px;
+    }
+    .result-item{
+      padding: 10px 0;
+    }
+    .button{
+      padding: 12px 35px;
+      width: 120px;
+      background-color: #4595d5;
+      border-radius: 3px;
+      border: none;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all .25s;
+    }
+    button:active{
+      background-color: #71b4eb;
+    }
+    @media screen and (min-width: 900px)  {
+      .app{
+        width: 500px;
+        margin: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="form">
+      <div class="item">
+        <label for="money">月缴金额</label><input type="text" name="money" class="money">
+      </div>
+      <div class="item">
+        <label for="year">期数</label><select name="year" class="year"></select>
+      </div>
+      <div class="item">
+        <label for="lv">执行利率</label><select name="lv" class="lv"></select>
+      </div>
+      <div class="item">
+        <button type="button" class="button">提交</button>
+      </div>
+    </div>
+    <div class="result">
+      <div class="result-item">
+        <span>到期总金额：</span>
+        <span class="count"></span>
+      </div>
+      <div class="result-item">
+        <span>月收益：</span>
+        <span class="month_result"></span>
+      </div>
+    </div>
+  </div>
+  <script>
+    const moneyEl = document.querySelector(".money")
+    const yearEl = document.querySelector(".year")
+    const lvEl = document.querySelector(".lv")
+    const btnEl = document.querySelector(".button")
+    const countEl = document.querySelector(".count")
+    const monthResultEl = document.querySelector(".month_result")
+    
+    setYearList()
+    setLvList()
+    btnEl.addEventListener('click', submit, false)
+
+    function submit(){
+      const money = toNum(moneyEl.value)
+      const year = toNum(yearEl.value)
+      const lv = toNum(lvEl.value)
+      
+      const { count, monthResult } = calc(money, year, lv)
+      setText(countEl, `${count} 元`)
+      setText(monthResultEl, `${monthResult} 元`)
+    }
+
+    function calc(money, year, lv){
+      // 月利率
+      const l_num = toNum((lv / 12).toFixed(5))
+      // 月份总数
+      let index = year * 12
+      // 总金额
+      let num = 0
+      console.log(l_num, index, money, lv);
+      while (index > 0){
+        num = monthTotal(num, money, l_num)
+        index = index - 1
+      }
+      return {
+        count: Math.floor(num * 100) / 100,
+        monthResult: Math.floor(num * l_num)
+      }
+    }
+
+    function monthTotal(total, month, lv){
+      return Math.floor(((total + month) * (lv + 1))*100)/100
+    }
+
+    function setText(el, text){
+      el.innerText = text
+    }
+
+    function toNum(t){
+      const num = Number.parseFloat(t)
+      if(Number.isNaN(num)) throw 'NaN'
+      return num
+    }
+
+    function addOptions(el, data){
+      const dom = document.createDocumentFragment()
+      data.forEach(({ label, value }) => {
+        const option = document.createElement('option')
+        option.innerText = label;
+        option.value = value;
+        dom.appendChild(option)
+      });
+      el.appendChild(dom)
+    }
+
+    function setYearList(){
+      const list = Array.from({ length: 40 }, (_, index) => {
+        return {
+          value: index + 1,
+          label: `${index + 1} 年`
+        }
+      });
+      addOptions(yearEl, list)
+    }
+
+    function setLvList(){
+      const list = Array.from({ length: 20 }, (_, index) => {
+        return {
+          value: (index + 1) / 100,
+          label: `${index + 1} %`
+        }
+      });
+      addOptions(lvEl, list)
+    }
+  </script>
+</body>
+</html>
